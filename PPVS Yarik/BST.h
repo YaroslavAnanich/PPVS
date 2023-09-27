@@ -10,6 +10,12 @@ using namespace std;
 class BST
 {
 public:
+	enum Check
+	{
+		 LESS,
+		 MORE,
+		 EQUAL
+	};
 	BST();
 	~BST();
 	int del(string word, string translation);
@@ -20,7 +26,7 @@ public:
 	int change_translation(string word, string translation);
 	void print();
 	int getSize();
-private:
+ private:
 	class node
 	{
 	public:
@@ -32,7 +38,7 @@ private:
 	int size;
 	node* root;
 	node* del(string word, string translation, node* t);
-	int check(string word, node* t);
+	Check check(string word, node* t);
 	node* make_empty(node* t);
 	node* find_min(node* t);
 	void print(node* t);

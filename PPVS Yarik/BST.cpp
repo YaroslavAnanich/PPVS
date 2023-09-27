@@ -11,125 +11,117 @@ BST::~BST()
     root = make_empty(root);
 }
 
-int BST::check(string word, node* t)
+BST::Check BST::check(string word, node* input_node)
 {
-    int temp;
-    if (word.size() < t->word.size())
+    Check state;
+    int length;
+    if (word.size() < input_node->word.size())
     {
-        temp = word.size();
+        length = word.size();
     }
     else
     {
-        temp = t->word.size();
+        length = input_node->word.size();
     }
-    for (int i = 0; i < temp; i++)
+    for (int i = 0; i < length; i++)
     {
-        if (int(word[i]) == int(t->word[i]))
+        if (int(word[i]) == int(input_node->word[i]))
         {
             continue;
         }
-        if (int(word[i]) < int(t->word[i]))
+        if (int(word[i]) < int(input_node->word[i]))
         {
-            return 1;
+            return state = LESS;
         }
-        if (int(word[i]) > int(t->word[i]))
+        if (int(word[i]) > int(input_node->word[i]))
         {
-            return 2;
+            return state = MORE;
         }
     }
-    return 3;
+    return state = EQUAL;
 }
 
-BST::node* BST::make_empty(node* t)
+BST::node* BST::make_empty(node* input_node)
 {
-    if (t == NULL)
+    if (input_node == NULL)
         return NULL;
     else
     {
-        make_empty(t->left);
-        make_empty(t->right);
-        delete t;
+        make_empty(input_node->left);
+        make_empty(input_node->right);
+        delete input_node;
     }
     return NULL;
 }
 
-BST::node* BST::push(string word, string translation, node* t)
+BST::node* BST::push(string word, string translation, node* input_node)
 {
-    if (t == NULL)
+    if (input_node == NULL)
     {
-        t = new node;
-        t->word = word;
-        t->translation = translation;
-        t->left = t->right = NULL;
+        input_node = new node;
+        input_node->word = word;
+        input_node->translation = translation;
+        input_node->left = input_node->right = NULL;
         size++;
     }
-    else if (check(word, t) == 1)
-        t->left = push(word, translation, t->left);
-    else if (check(word, t) == 2)
-        t->right = push(word, translation, t->right);
-    return t;
+    else if (check(word, input_node) == LESS)
+        input_node->left = push(word, translation, input_node->left);
+    else if (check(word, input_node) == MORE)
+        input_node->right = push(word, translation, input_node->right);
+    return input_node;
 }
 
-BST::node* BST::find_min(node* t)
+BST::node* BST::find_min(node* input_node)
 {
-    if (t == NULL)
+    if (input_node == NULL)
         return NULL;
-    else if (t->left == NULL)
-        return t;
+    else if (input_node->left == NULL)
+        return input_node;
     else
-        return find_min(t->left);
+        return find_min(input_node->left);
 }
 
-BST::node* BST::del(string word, string translation, node* t) {
-    node* temp;
-    if (t == NULL)
+BST::node* BST::del(string word, string translation, node* input_node) {
+    node* del_node;
+    if (input_node == NULL)
         return NULL;
-    else if (check(word, t) == 1)
-        t->left = del(word, translation, t->left);
-    else if (check(word, t) == 2)
-        t->right = del(word, translation, t->right);
-    else if (t->left && t->right)
+    else if (check(word, input_node) == LESS)
+        input_node->left = del(word, translation, input_node->left);
+    else if (check(word, input_node) == MORE)
+        input_node->right = del(word, translation, input_node->right);
+    else if (input_node->left && input_node->right)
     {
-        temp = find_min(t->right);
-        t->word = temp->word;
-        t->translation = temp->translation;
-        t->right = del(word, translation, t->right);
+        del_node = find_min(input_node->right);
+        input_node->word = del_node->word;
+        input_node->translation = del_node->translation;
+        input_node->right = del(word, translation, input_node->right);
     }
     else
     {
-        temp = t;
-        if (t->left == NULL)
-            t = t->right;
-        else if (t->right == NULL)
-            t = t->left;
-        delete temp;
+        del_node = input_node;
+        if (input_node->left == NULL)
+            input_node = input_node->right;
+        else if (input_node->right == NULL)
+            input_node = input_node->left;
+        delete del_node;
     }
-    return t;
+    return input_node;
 }
 
-BST::node* BST::find(node* t, string word) {
-    if (t == NULL)
+BST::node* BST::find(node* input_node, string word) {
+    if (input_node == NULL)
     {
         return NULL;
     }
-    else if (check(word, t) == 1)
-        return find(t->left, word);
-    else if (check(word, t) == 2)
-        return find(t->right, word);
+    else if (check(word, input_node) == LESS)
+        return find(input_node->left, word);
+    else if (check(word, input_node) == MORE)
+        return find(input_node->right, word);
     else
-        return t;
+        return input_node;
 }
 
-void BST::print(node* t)
-{
-    if (t == NULL)
-    {
-        return;
-    }
-    print(t->left);
-    cout << t->word << " - " << t->translation << endl;
-    print(t->right);
-}
+
 
 
 string BST::operator[](string word)
@@ -145,17 +137,17 @@ void BST::push(string word, string translation) {
 }
 
 void BST::push(char word[], char translation[]) {
-    string temp1, temp2;
+    string push_word, push_translation;
     int a = strlen(word);
     for (int i = 0; i < strlen(word); i++)
     {
-        temp1.push_back(word[i]);
+        push_word.push_back(word[i]);
     }
     for (int i = 0; i < strlen(translation); i++)
     {
-        temp2.push_back(translation[i]);
+        push_translation.push_back(translation[i]);
     }
-    root = push(temp1, temp2, root);
+    root = push(push_word, push_translation, root);
 }
 
 int BST::del(string word, string translation)
@@ -171,11 +163,7 @@ int BST::del(string word, string translation)
     }
 }
 
-void BST::print() {
-    cout << endl;
-    print(root);
-    cout << endl;
-}
+
 
 int BST::getSize() { return size; }
 
@@ -193,7 +181,7 @@ void BST::pull_file(string path)
             fin >> word;
             fin >> translation;
             push(word, translation);
-            size++;
+            
         }
     }
     fin.close();
